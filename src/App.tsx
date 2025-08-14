@@ -1,7 +1,8 @@
 import './App.css';
-import { Button } from '@ui5/webcomponents-react';
+import { Button, Title } from '@ui5/webcomponents-react';
+import Toolbar from './components/Toolbar';
 
-function App() {
+export default function App() {
   async function sendMessage() {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -17,9 +18,7 @@ function App() {
 
   return (
     <>
-      <Button onClick={sendMessage}>Send message</Button>
+      <Toolbar />
     </>
   );
 }
-
-export default App;
