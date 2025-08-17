@@ -7,11 +7,20 @@ import {
 export default function Input({
   id,
   placeHolder,
+  filterInputValue,
   handleInput
-}: {
+}: Readonly<{
   id: string;
   placeHolder: string;
+  filterInputValue: string;
   handleInput: (event: Ui5CustomEvent<InputDomRef, never>) => void;
-}) {
-  return <UI5Input id={id} placeholder={placeHolder} onInput={handleInput} />;
+}>) {
+  return (
+    <UI5Input
+      id={id}
+      placeholder={placeHolder}
+      value={filterInputValue}
+      onInput={handleInput}
+    />
+  );
 }
