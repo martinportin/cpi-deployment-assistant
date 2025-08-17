@@ -8,14 +8,15 @@ import Input from './Input';
 import ButtonDesign from '@ui5/webcomponents/dist/types/ButtonDesign';
 import ToolbarButton from './ToolbarButton';
 
-export default function Toolbar() {
+export default function Toolbar({
+  filterInputValue,
+  handleFilterInputChange
+}: Readonly<{
+  filterInputValue: string;
+  handleFilterInputChange: (event: Ui5CustomEvent<InputDomRef, never>) => void;
+}>) {
   function handleClick() {
     console.log('Click!');
-  }
-
-  function handleInput(event: Ui5CustomEvent<InputDomRef, never>) {
-    const value = event;
-    console.log(value);
   }
 
   return (
@@ -27,13 +28,13 @@ export default function Toolbar() {
         text="Load artifacts"
       />
       <ToolbarSpacer />
-      <Input id="filterInput" placeHolder="" handleInput={handleInput} />
-      <ToolbarButton
-        id="filterArtifactsButton"
-        disabled={false}
-        handleClick={handleClick}
-        text="Filter artifacts"
+      <Input
+        id="filterInput"
+        placeHolder=""
+        filterInputValue={filterInputValue}
+        handleInput={handleFilterInputChange}
       />
+      <ToolbarSpacer />
       <ToolbarButton
         id="deployArtifactsButton"
         disabled={false}
