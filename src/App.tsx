@@ -1,28 +1,16 @@
 import './App.css';
 import Toolbar from './components/Toolbar';
 import Table from './components/Table';
-import { Artifact } from './components/custom';
 import {
   InputDomRef,
   ToolbarButtonDomRef,
   Ui5CustomEvent
 } from '@ui5/webcomponents-react';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { sendMessage } from './utils/Message';
+import { Artifact } from './custom';
 
 export default function App() {
-  async function sendMessage() {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    });
-    if (tab.id) {
-      const response = await chrome.tabs.sendMessage(tab.id, {
-        subject: 'world'
-      });
-      console.log(response.response);
-    }
-  }
-
   const [artifacts, setArtifacts]: [
     Artifact[],
     Dispatch<SetStateAction<Artifact[]>>
@@ -51,6 +39,18 @@ export default function App() {
   ]);
   const [filterInputValue, setFilterInputValue] = useState('');
 
+  async function handleLoadArtifactsButtonClick(
+    event: Ui5CustomEvent<ToolbarButtonDomRef, never>
+  ) {
+    try {
+      console.log('!');
+      const response = await sendMessage('get artifacts');
+      setArtifacts(response);
+    } catch (reason) {
+      console.log(reason);
+    }
+  }
+
   function handleFilterInputChange(event: Ui5CustomEvent<InputDomRef, never>) {
     setFilterInputValue(event.target.value);
   }
@@ -67,6 +67,7 @@ export default function App() {
     <>
       <Toolbar
         filterInputValue={filterInputValue}
+        handleLoadArtifactsButtonClick={handleLoadArtifactsButtonClick}
         handleFilterInputChange={handleFilterInputChange}
       />
       <Table headers={headers} artifacts={filterArtifacts()} />
