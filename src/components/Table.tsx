@@ -2,9 +2,9 @@ import {
   TableSelectionMulti,
   Table as UI5Table
 } from '@ui5/webcomponents-react';
-import { Artifact } from './custom';
 import TableHeader from './TableHeader';
 import TableRows from './TableRows';
+import { Artifact } from '../custom';
 
 export default function Table({
   headers,

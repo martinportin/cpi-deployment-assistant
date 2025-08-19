@@ -1,5 +1,6 @@
 import {
   InputDomRef,
+  ToolbarButtonDomRef,
   ToolbarSpacer,
   Ui5CustomEvent,
   Toolbar as UI5Toolbar
@@ -10,9 +11,13 @@ import ToolbarButton from './ToolbarButton';
 
 export default function Toolbar({
   filterInputValue,
+  handleLoadArtifactsButtonClick,
   handleFilterInputChange
 }: Readonly<{
   filterInputValue: string;
+  handleLoadArtifactsButtonClick: (
+    event: Ui5CustomEvent<ToolbarButtonDomRef, never>
+  ) => void;
   handleFilterInputChange: (event: Ui5CustomEvent<InputDomRef, never>) => void;
 }>) {
   function handleClick() {
@@ -24,7 +29,7 @@ export default function Toolbar({
       <ToolbarButton
         id="loadArtifactsButton"
         disabled={false}
-        handleClick={handleClick}
+        handleClick={handleLoadArtifactsButtonClick}
         text="Load artifacts"
       />
       <ToolbarSpacer />

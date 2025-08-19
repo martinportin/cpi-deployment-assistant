@@ -1,5 +1,5 @@
 import { TableRow, TableCell, Label } from '@ui5/webcomponents-react';
-import { Artifact } from './custom';
+import { Artifact } from '../custom';
 
 export default function TableRows({ artifacts }: { artifacts: Artifact[] }) {
   function getTableRows(artifacts: Artifact[]) {
