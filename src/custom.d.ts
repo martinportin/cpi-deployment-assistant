@@ -1,3 +1,7 @@
+interface MessageObject {
+  message: Message
+}
+
 type Message = 'get artifacts' | 'deploy artifacts' | 'undeploy artifatcs';
 
 interface XHRRequest {
@@ -28,6 +32,11 @@ interface CPIArtifact {
   reg_id: string;
 }
 
+interface IntegrationDeploumentStatus {
+  name: string | null;
+  deploymentStatus: string | null;
+}
+
 interface Package {
   regId: string;
   displayName: string;
@@ -39,16 +48,21 @@ interface Artifact {
   regId: string;
   displayName: string;
   name: string;
-  deployStatus: 'Deployed' | 'Undeployed';
+  deployStatus: DeployStatus
   packageRegId: string;
 }
 
+type DeploymentStatus = 'DEPLOYED' | 'UNDEPLOYED';
+
 export {
+  MessageObject,
+  Message,
   XHRRequest,
   XHRResponse,
-  Message,
-  CPIArtifact,
   CPIPackage,
+  CPIArtifact,
+  IntegrationDeploumentStatus,
   Package,
-  Artifact
+  Artifact,
+  DeploymentStatus
 };

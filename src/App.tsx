@@ -11,39 +11,13 @@ import { sendMessage } from './utils/Message';
 import { Artifact } from './custom';
 
 export default function App() {
-  const [artifacts, setArtifacts]: [
-    Artifact[],
-    Dispatch<SetStateAction<Artifact[]>>
-  ] = useState([
-    {
-      regId: '1',
-      displayName: 'Artifact 1',
-      name: 'Artifact_1',
-      deployStatus: 'Deployed',
-      packageRegId: '10'
-    },
-    {
-      regId: '2',
-      displayName: 'Artifact 2',
-      name: 'Artifact_2',
-      deployStatus: 'Undeployed',
-      packageRegId: '20'
-    },
-    {
-      regId: '3',
-      displayName: 'Artifact 3',
-      name: 'Artifact_3',
-      deployStatus: 'Deployed',
-      packageRegId: '30'
-    }
-  ]);
+  const [artifacts, setArtifacts]  = useState<Artifact[]>([]);
   const [filterInputValue, setFilterInputValue] = useState('');
 
   async function handleLoadArtifactsButtonClick(
     event: Ui5CustomEvent<ToolbarButtonDomRef, never>
   ) {
     try {
-      console.log('!');
       const response = await sendMessage('get artifacts');
       setArtifacts(response);
     } catch (reason) {
