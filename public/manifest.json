@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://example.com/"
+        "https://*.cfapps.eu20.hana.ondemand.com/shell/monitoring/Artifacts/*"
       ],
       "js": [
         "./static/js/content.js"
