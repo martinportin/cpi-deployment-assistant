@@ -1,33 +1,36 @@
-import {
-  ToolbarButton as UI5ToolbarButton,
-  Ui5CustomEvent,
-  ToolbarButtonDomRef
-} from '@ui5/webcomponents-react';
+import { Button, Ui5CustomEvent, ButtonDomRef } from '@ui5/webcomponents-react';
+import { ButtonClickEventDetail } from '@ui5/webcomponents/dist/Button';
 import ButtonDesign from '@ui5/webcomponents/dist/types/ButtonDesign';
 
 export default function ToolbarButton({
   id,
+  slot,
   disabled,
   design,
   icon,
-  handleClick,
-  text
+  text,
+  handleClick
 }: {
   id: string;
+  slot?: string;
   disabled: boolean;
   design?: ButtonDesign;
   icon?: string;
-  handleClick: (event: Ui5CustomEvent<ToolbarButtonDomRef, never>) => void;
   text: string;
+  handleClick: (
+    event: Ui5CustomEvent<ButtonDomRef, ButtonClickEventDetail>
+  ) => void;
 }) {
   return (
-    <UI5ToolbarButton
+    <Button
       id={id}
+      slot={slot}
       disabled={disabled}
       design={design}
       icon={icon}
-      text={text}
       onClick={handleClick}
-    />
+    >
+      {text}
+    </Button>
   );
 }
