@@ -1,5 +1,5 @@
 interface MessageObject {
-  message: Message
+  message: Message;
 }
 
 type Message = 'get artifacts' | 'deploy artifacts' | 'undeploy artifatcs';
@@ -48,7 +48,7 @@ interface Artifact {
   regId: string;
   displayName: string;
   name: string;
-  deployStatus: DeployStatus
+  deployStatus: DeploymentStatus;
   packageRegId: string;
 }
 

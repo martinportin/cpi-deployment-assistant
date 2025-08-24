@@ -11,9 +11,8 @@ export default function Table({
   artifacts
 }: Readonly<{ headers: string[]; artifacts: Artifact[] }>) {
   return (
-    <UI5Table id="artifactTable">
+    <UI5Table id="artifactTable" headerRow={<TableHeader headers={headers} />}>
       <TableSelectionMulti slot="features" headerSelector="SelectAll" />
-      <TableHeader headers={headers} />
       <TableRows artifacts={artifacts} />
     </UI5Table>
   );
