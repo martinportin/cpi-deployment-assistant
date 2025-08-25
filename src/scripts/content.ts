@@ -14,7 +14,7 @@ const domain = document.location.hostname;
 
 function addMessageListener() {
   chrome.runtime.onMessage.addListener(
-    handleMessage(domain, getArtifacts, deployArtifacts)
+    handleMessage(domain, getArtifacts, deployArtifacts, undeployArtifacts)
   );
 }
 
@@ -59,6 +59,17 @@ async function getIntegrations(domain: string): Promise<XHRResponse> {
 function getIntegratonDeploymentStatus(
   integrations: Document
 ): IntegrationDeploumentStatus[] {
+  const t1 = [...integrations.getElementsByTagName('artifactInformations')]
+  const t2 = t1.map((integrationInformation) => integrationInformation.childNodes)
+  console.log(t2);
+  const t3 = t2.map((childNodes) => childNodes[18]);
+  console.log(t3)
+  for (const t of t3) {
+    const s = <Element> t;
+    if (s.getAttribute('name') === 'SAP-ArtifactId') {
+      console.log(s.getAttribute('value'))
+    }
+  }
   return [...integrations.getElementsByTagName('artifactInformations')]
     .map((integrationInformation) => integrationInformation.childNodes)
     .map((childNodes) => ({
@@ -99,11 +110,21 @@ function getDeploymentStatus(
     : 'UNDEPLOYED';
 }
 
-async function deployArtifacts(domain: string): Promise<Artifact[]> {
-  return Promise.resolve([]);
+async function deployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
+  const failedArtifacts = []
+  for (const artifact of artifacts) {
+    try {
+      await deployArtifact(domain, artifact.packageRegId, artifact.regId, artifact.name);
+    } catch (error) {
+      console.log(error)
+      failedArtifacts.push(artifact);
+    }
+  }
+  return failedArtifacts;
 }
 
 async function deployArtifact(
+  domain: string,
   packageRegId: string,
   artifactRegId: string,
   artifactName: string
@@ -115,6 +136,32 @@ async function deployArtifact(
     query: '?webdav=DEPLOY',
     useCsrfToken: true
   });
+}
+
+async function undeployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
+  const failedArtifacts = []
+  for (const artifact of artifacts) {
+    try {
+      const body = new FormData()
+      body.append('artifactIds', artifact.regId)
+      body.append('tentnatId', 'development-po4xtz6u')
+      await undeployArtifact(domain, body);
+    } catch (error) {
+      console.log(error);
+      failedArtifacts.push(artifact);
+    }
+  }
+  return failedArtifacts;
+}
+
+async function undeployArtifact(domain: string, body: XMLHttpRequestBodyInit): Promise<XMLHttpRequest> {
+  return await makeXHRRequest({
+    method: 'POST',
+    domain,
+    resource: '/Operations/com.sap.it.nm.commands.deploy.DeleteContentCommand',
+    body,
+    useCsrfToken: true
+  })
 }
 
 addMessageListener();

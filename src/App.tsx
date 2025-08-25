@@ -4,6 +4,8 @@ import {
   ButtonDomRef,
   InputDomRef,
   Page,
+  TableSelectionMultiDomRef,
+  Toast,
   Ui5CustomEvent
 } from '@ui5/webcomponents-react';
 import { MouseEvent, useState } from 'react';
@@ -25,6 +27,8 @@ export default function App() {
     isUndeployedArtifactsCheckboxChecked,
     setIsUndeployedArtifactsCheckboxChecked
   ] = useState(true);
+  const [selectedRowsKeys, setSelectedRowsKeys] = useState('')
+  const [showDeploymentSuccessToast, setShowDeploymentSuccessToast] = useState(false)
 
   async function handleLoadArtifactsButtonClick(
     event: Ui5CustomEvent<ButtonDomRef, ButtonClickEventDetail>
@@ -41,7 +45,7 @@ export default function App() {
     setFilterInputValue(event.target.value);
   }
 
-  function handleCheckBoxClick(event: MouseEvent<HTMLElement>) {
+  function handleCheckboxClick(event: MouseEvent<HTMLElement>) {
     const checkboxId = event.currentTarget.id;
     switch (checkboxId) {
       case 'deployCheckbox':
@@ -57,6 +61,38 @@ export default function App() {
     }
   }
 
+  function handleTableSelectionChange(event: Ui5CustomEvent<TableSelectionMultiDomRef, never>) {
+    const selectedRowsKeys = event.target.selected
+    setSelectedRowsKeys(selectedRowsKeys)
+
+  }
+
+  async function handleDeployArtifactsButtonClick() {
+    try {
+      const selectedArtifacts = artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
+      const failedArtifacts = await sendMessage('deploy artifacts', selectedArtifacts)
+      if(!failedArtifacts.length) {
+        setShowDeploymentSuccessToast(true)
+      } 
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleDeploymentSuccessToastClose() {
+    setShowDeploymentSuccessToast(false)
+  }
+
+  async function handleUndeployArtifactsButtonClick() {
+    try {
+      const selectedArtifacts = artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
+      const failedArtifacts = await sendMessage('undeploy artifatcs', selectedArtifacts)
+      console.log(failedArtifacts);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   function filterArtifacts(): Artifact[] {
     return artifacts.filter(
       (artifact) =>
@@ -68,11 +104,7 @@ export default function App() {
     );
   }
 
-  const headers = ['Artifact name', 'Deploy Status'];
-
-  function handleOnClick() {
-    console.log('click');
-  }
+  const headers = ['Artifact name', 'Deployment Status'];
 
   return (
     <Page
@@ -88,21 +120,22 @@ export default function App() {
             isUndeployedArtifactsCheckboxChecked
           }
           handleFilterInputChange={handleFilterInputChange}
-          handleDeployedCheckboxClick={handleCheckBoxClick}
-          handleUnDeployedCheckboxClick={handleCheckBoxClick}
+          handleDeployedCheckboxClick={handleCheckboxClick}
+          handleUnDeployedCheckboxClick={handleCheckboxClick}
         />
       }
       footer={
         <BottomToolbar
           design={BarDesign.Footer}
           handleLoadArtifactsButtonClick={handleLoadArtifactsButtonClick}
-          handleDeployArtifactsButtonClick={handleOnClick}
-          handleUndeployArtifactsButtonClick={handleOnClick}
+          handleDeployArtifactsButtonClick={handleDeployArtifactsButtonClick}
+          handleUndeployArtifactsButtonClick={handleUndeployArtifactsButtonClick}
         />
       }
       style={{ height: '500px' }}
     >
-      <Table headers={headers} artifacts={filterArtifacts()} />
+      <Table headers={headers} artifacts={filterArtifacts()} handleSelectionChange={handleTableSelectionChange}/>
+      <Toast open={showDeploymentSuccessToast} onClose={handleDeploymentSuccessToastClose}>All selected artifacts have been triggered for deployment!</Toast>
     </Page>
   );
 }
