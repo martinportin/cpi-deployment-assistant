@@ -5,6 +5,7 @@ async function makeXHRRequest({
   domain,
   resource,
   query = '',
+  body = null,
   useCsrfToken = false
 }: XHRRequest): Promise<XMLHttpRequest> {
   return new Promise(async (resolve, reject) => {
@@ -22,7 +23,7 @@ async function makeXHRRequest({
         reject(xhr);
       }
     };
-    xhr.send();
+    xhr.send(body);
   });
 }
 

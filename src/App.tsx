@@ -1,9 +1,12 @@
 import './App.css';
 import Table from './components/Table';
 import {
+  BusyIndicator,
   ButtonDomRef,
   InputDomRef,
   Page,
+  TableSelectionMultiDomRef,
+  Toast,
   Ui5CustomEvent
 } from '@ui5/webcomponents-react';
 import { MouseEvent, useState } from 'react';
@@ -25,15 +28,25 @@ export default function App() {
     isUndeployedArtifactsCheckboxChecked,
     setIsUndeployedArtifactsCheckboxChecked
   ] = useState(true);
+  const [selectedRowsKeys, setSelectedRowsKeys] = useState('')
+  const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
+  const [showBusyIndicator, setShowBusyIndicator] = useState(false);
+  const [showDeploymentSuccessToast, setShowDeploymentSuccessToast] = useState(false);
+  const [showUndeploymentSuccessToast, setShowUndeploymentSuccessToast] = useState(false);
 
   async function handleLoadArtifactsButtonClick(
     event: Ui5CustomEvent<ButtonDomRef, ButtonClickEventDetail>
   ) {
     try {
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
       const response = await sendMessage('get artifacts');
       setArtifacts(response);
     } catch (reason) {
       console.log(reason);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
     }
   }
 
@@ -41,7 +54,7 @@ export default function App() {
     setFilterInputValue(event.target.value);
   }
 
-  function handleCheckBoxClick(event: MouseEvent<HTMLElement>) {
+  function handleCheckboxClick(event: MouseEvent<HTMLElement>) {
     const checkboxId = event.currentTarget.id;
     switch (checkboxId) {
       case 'deployCheckbox':
@@ -57,6 +70,58 @@ export default function App() {
     }
   }
 
+  function handleTableSelectionChange(event: Ui5CustomEvent<TableSelectionMultiDomRef, never>) {
+    const selectedRowsKeys = event.target.selected
+    setSelectedRowsKeys(selectedRowsKeys)
+
+  }
+
+  async function handleDeployArtifactsButtonClick() {
+    try {
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
+      const selectedArtifacts = getSelectedArtifacts(artifacts)
+      const failedArtifacts = await sendMessage('deploy artifacts', selectedArtifacts)
+      if(!failedArtifacts.length) {
+        setShowDeploymentSuccessToast(true)
+      } 
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
+    }
+  }
+
+  function getSelectedArtifacts(artifacts: Artifact[]): Artifact[] {
+    return artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
+  }
+
+  function handleDeploymentSuccessToastClose() {
+    setShowDeploymentSuccessToast(false)
+  }
+
+  async function handleUndeployArtifactsButtonClick() {
+    try {
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
+      const selectedArtifacts = getSelectedArtifacts(artifacts)
+      const failedArtifacts = await sendMessage('undeploy artifatcs', selectedArtifacts)
+      if(!failedArtifacts.length) {
+        setShowUndeploymentSuccessToast(true)
+      } 
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
+    }
+  }
+
+  function handleUndeploymentSuccessToastClose() {
+    setShowUndeploymentSuccessToast(false)
+  }
+
   function filterArtifacts(): Artifact[] {
     return artifacts.filter(
       (artifact) =>
@@ -68,11 +133,9 @@ export default function App() {
     );
   }
 
-  const headers = ['Artifact name', 'Deploy Status'];
+  const headers = ['Artifact name', 'Deployment Status'];
 
-  function handleOnClick() {
-    console.log('click');
-  }
+  console.log(isButtonsDisabled)
 
   return (
     <Page
@@ -88,21 +151,26 @@ export default function App() {
             isUndeployedArtifactsCheckboxChecked
           }
           handleFilterInputChange={handleFilterInputChange}
-          handleDeployedCheckboxClick={handleCheckBoxClick}
-          handleUnDeployedCheckboxClick={handleCheckBoxClick}
+          handleDeployedCheckboxClick={handleCheckboxClick}
+          handleUnDeployedCheckboxClick={handleCheckboxClick}
         />
       }
       footer={
         <BottomToolbar
           design={BarDesign.Footer}
+          isButtonsDisabled={isButtonsDisabled}
           handleLoadArtifactsButtonClick={handleLoadArtifactsButtonClick}
-          handleDeployArtifactsButtonClick={handleOnClick}
-          handleUndeployArtifactsButtonClick={handleOnClick}
+          handleDeployArtifactsButtonClick={handleDeployArtifactsButtonClick}
+          handleUndeployArtifactsButtonClick={handleUndeployArtifactsButtonClick}
         />
       }
       style={{ height: '500px' }}
-    >
-      <Table headers={headers} artifacts={filterArtifacts()} />
+    > 
+      <BusyIndicator active={showBusyIndicator} size='L' style={ { display: 'block'}}>
+        <Table headers={headers} artifacts={filterArtifacts()} handleSelectionChange={handleTableSelectionChange}/>
+      </BusyIndicator>
+      <Toast open={showDeploymentSuccessToast} onClose={handleDeploymentSuccessToastClose}>All selected artifacts have been triggered for deployment!</Toast>
+      <Toast open={showUndeploymentSuccessToast} onClose={handleUndeploymentSuccessToastClose}>All selected artifacts have been triggered for undeployment!</Toast>
     </Page>
   );
 }

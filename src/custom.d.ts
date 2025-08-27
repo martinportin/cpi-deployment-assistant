@@ -1,5 +1,6 @@
 interface MessageObject {
   message: Message;
+  artifacts?: Artifact[]
 }
 
 type Message = 'get artifacts' | 'deploy artifacts' | 'undeploy artifatcs';
@@ -8,8 +9,14 @@ interface XHRRequest {
   method: 'GET' | 'PUT' | 'POST';
   domain: string;
   resource: string;
+  body?: Document | XMLHttpRequestBodyInit | null | undefined
   query?: string;
   useCsrfToken?: boolean;
+}
+
+interface UndeployArtifactBody {
+  artifactsId: string
+  tenantId: string;
 }
 
 interface XHRResponse {
@@ -35,6 +42,8 @@ interface CPIArtifact {
 interface IntegrationDeploumentStatus {
   name: string | null;
   deploymentStatus: string | null;
+  semanticState: string | null;
+  sapArtifactId: string | null;
 }
 
 interface Package {
@@ -50,6 +59,7 @@ interface Artifact {
   name: string;
   deployStatus: DeploymentStatus;
   packageRegId: string;
+  sapArtifactId: string | null;
 }
 
 type DeploymentStatus = 'DEPLOYED' | 'UNDEPLOYED';
