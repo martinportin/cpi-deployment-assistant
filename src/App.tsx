@@ -1,6 +1,7 @@
 import './App.css';
 import Table from './components/Table';
 import {
+  BusyIndicator,
   ButtonDomRef,
   InputDomRef,
   Page,
@@ -28,16 +29,24 @@ export default function App() {
     setIsUndeployedArtifactsCheckboxChecked
   ] = useState(true);
   const [selectedRowsKeys, setSelectedRowsKeys] = useState('')
-  const [showDeploymentSuccessToast, setShowDeploymentSuccessToast] = useState(false)
+  const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
+  const [showBusyIndicator, setShowBusyIndicator] = useState(false);
+  const [showDeploymentSuccessToast, setShowDeploymentSuccessToast] = useState(false);
+  const [showUndeploymentSuccessToast, setShowUndeploymentSuccessToast] = useState(false);
 
   async function handleLoadArtifactsButtonClick(
     event: Ui5CustomEvent<ButtonDomRef, ButtonClickEventDetail>
   ) {
     try {
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
       const response = await sendMessage('get artifacts');
       setArtifacts(response);
     } catch (reason) {
       console.log(reason);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
     }
   }
 
@@ -69,14 +78,23 @@ export default function App() {
 
   async function handleDeployArtifactsButtonClick() {
     try {
-      const selectedArtifacts = artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
+      const selectedArtifacts = getSelectedArtifacts(artifacts)
       const failedArtifacts = await sendMessage('deploy artifacts', selectedArtifacts)
       if(!failedArtifacts.length) {
         setShowDeploymentSuccessToast(true)
       } 
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
     }
+  }
+
+  function getSelectedArtifacts(artifacts: Artifact[]): Artifact[] {
+    return artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
   }
 
   function handleDeploymentSuccessToastClose() {
@@ -85,12 +103,23 @@ export default function App() {
 
   async function handleUndeployArtifactsButtonClick() {
     try {
-      const selectedArtifacts = artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
+      setIsButtonsDisabled(true)
+      setShowBusyIndicator(true)
+      const selectedArtifacts = getSelectedArtifacts(artifacts)
       const failedArtifacts = await sendMessage('undeploy artifatcs', selectedArtifacts)
-      console.log(failedArtifacts);
+      if(!failedArtifacts.length) {
+        setShowUndeploymentSuccessToast(true)
+      } 
     } catch (error) {
       console.log(error);
+    } finally {
+      setShowBusyIndicator(false)
+      setIsButtonsDisabled(false)
     }
+  }
+
+  function handleUndeploymentSuccessToastClose() {
+    setShowUndeploymentSuccessToast(false)
   }
 
   function filterArtifacts(): Artifact[] {
@@ -105,6 +134,8 @@ export default function App() {
   }
 
   const headers = ['Artifact name', 'Deployment Status'];
+
+  console.log(isButtonsDisabled)
 
   return (
     <Page
@@ -127,15 +158,19 @@ export default function App() {
       footer={
         <BottomToolbar
           design={BarDesign.Footer}
+          isButtonsDisabled={isButtonsDisabled}
           handleLoadArtifactsButtonClick={handleLoadArtifactsButtonClick}
           handleDeployArtifactsButtonClick={handleDeployArtifactsButtonClick}
           handleUndeployArtifactsButtonClick={handleUndeployArtifactsButtonClick}
         />
       }
       style={{ height: '500px' }}
-    >
-      <Table headers={headers} artifacts={filterArtifacts()} handleSelectionChange={handleTableSelectionChange}/>
+    > 
+      <BusyIndicator active={showBusyIndicator} size='L' style={ { display: 'block'}}>
+        <Table headers={headers} artifacts={filterArtifacts()} handleSelectionChange={handleTableSelectionChange}/>
+      </BusyIndicator>
       <Toast open={showDeploymentSuccessToast} onClose={handleDeploymentSuccessToastClose}>All selected artifacts have been triggered for deployment!</Toast>
+      <Toast open={showUndeploymentSuccessToast} onClose={handleUndeploymentSuccessToastClose}>All selected artifacts have been triggered for undeployment!</Toast>
     </Page>
   );
 }

@@ -42,6 +42,8 @@ interface CPIArtifact {
 interface IntegrationDeploumentStatus {
   name: string | null;
   deploymentStatus: string | null;
+  semanticState: string | null;
+  sapArtifactId: string | null;
 }
 
 interface Package {
@@ -57,6 +59,7 @@ interface Artifact {
   name: string;
   deployStatus: DeploymentStatus;
   packageRegId: string;
+  sapArtifactId: string | null;
 }
 
 type DeploymentStatus = 'DEPLOYED' | 'UNDEPLOYED';

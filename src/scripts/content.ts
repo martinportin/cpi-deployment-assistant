@@ -59,23 +59,22 @@ async function getIntegrations(domain: string): Promise<XHRResponse> {
 function getIntegratonDeploymentStatus(
   integrations: Document
 ): IntegrationDeploumentStatus[] {
-  const t1 = [...integrations.getElementsByTagName('artifactInformations')]
-  const t2 = t1.map((integrationInformation) => integrationInformation.childNodes)
-  console.log(t2);
-  const t3 = t2.map((childNodes) => childNodes[18]);
-  console.log(t3)
-  for (const t of t3) {
-    const s = <Element> t;
-    if (s.getAttribute('name') === 'SAP-ArtifactId') {
-      console.log(s.getAttribute('value'))
-    }
-  }
   return [...integrations.getElementsByTagName('artifactInformations')]
     .map((integrationInformation) => integrationInformation.childNodes)
     .map((childNodes) => ({
       name: childNodes[5].textContent,
-      deploymentStatus: childNodes[1].textContent
+      deploymentStatus: childNodes[1].textContent,
+      semanticState: childNodes[8].textContent,
+      sapArtifactId: extractSapArtifactId(childNodes)
     }));
+}
+
+function extractSapArtifactId(nodes: NodeListOf<ChildNode>) {
+  const sapArtifactId = <Element> [...nodes].find((node) => {
+    const element = <Element> node;
+    return element.getAttribute('name') === 'SAP-ArtifactId'
+  })
+  return sapArtifactId.getAttribute('value');
 }
 
 function extractArtifacts(
@@ -93,7 +92,9 @@ function extractArtifacts(
           cpiArtifact.DisplayName,
           integrationDeploymentStatus
         ),
-        packageRegId: cpiPackage.reg_id
+        packageRegId: cpiPackage.reg_id,
+        sapArtifactId: getSapArtifactId(cpiArtifact.DisplayName,
+          integrationDeploymentStatus)
       })
     );
     artifacts.push(...cpiPackageArtifacts);
@@ -109,6 +110,11 @@ function getDeploymentStatus(
     ? 'DEPLOYED'
     : 'UNDEPLOYED';
 }
+
+function getSapArtifactId(name: string,
+  deploymentStatus: IntegrationDeploumentStatus[]) {
+    return deploymentStatus.find((status) => status.name === name)?.sapArtifactId ?? null;
+  }
 
 async function deployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
   const failedArtifacts = []
@@ -143,8 +149,8 @@ async function undeployArtifacts(domain: string, artifacts: Artifact[]): Promise
   for (const artifact of artifacts) {
     try {
       const body = new FormData()
-      body.append('artifactIds', artifact.regId)
-      body.append('tentnatId', 'development-po4xtz6u')
+      body.append('artifactIds', artifact.sapArtifactId ?? '')
+      body.append('tenantId', 'development-po4xtz6u')
       await undeployArtifact(domain, body);
     } catch (error) {
       console.log(error);

@@ -44,7 +44,7 @@ function handleMessage(
       }
 
       if (message.message === 'undeploy artifatcs' && message.artifacts) {
-        const failedArtifacts = undeployArtifacts(domain, message.artifacts)
+        const failedArtifacts = await undeployArtifacts(domain, message.artifacts)
         sendResponse(failedArtifacts);
       }
     })();
