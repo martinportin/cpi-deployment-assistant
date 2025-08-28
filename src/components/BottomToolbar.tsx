@@ -37,7 +37,6 @@ export default function BottomToolbar({
           handleClick={handleLoadArtifactsButtonClick}
           text="Load artifacts"
         />
-        <Switch />
         </>
       }
       endContent={
