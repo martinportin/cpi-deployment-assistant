@@ -5,7 +5,8 @@ import {
   CPIPackage,
   XHRResponse,
   DeploymentStatus,
-  XHRRequest
+  XHRRequest,
+  SemanticStatus
 } from '../custom';
 import { handleMessage } from '../utils/Message';
 import { makeXHRRequest } from '../utils/XHRRequest';
@@ -64,7 +65,7 @@ function getIntegratonDeploymentStatus(
     .map((childNodes) => ({
       name: childNodes[5].textContent,
       deploymentStatus: childNodes[1].textContent,
-      semanticState: childNodes[8].textContent,
+      semanticState: childNodes[7].textContent,
       sapArtifactId: extractSapArtifactId(childNodes)
     }));
 }
@@ -92,6 +93,8 @@ function extractArtifacts(
           cpiArtifact.DisplayName,
           integrationDeploymentStatus
         ),
+        semanticStatus: getSemanticStatus(cpiArtifact.DisplayName,
+          integrationDeploymentStatus),
         packageRegId: cpiPackage.reg_id,
         sapArtifactId: getSapArtifactId(cpiArtifact.DisplayName,
           integrationDeploymentStatus)
@@ -106,10 +109,13 @@ function getDeploymentStatus(
   name: string,
   deploymentStatus: IntegrationDeploumentStatus[]
 ): DeploymentStatus {
-  return deploymentStatus.some((status) => status.name === name)
-    ? 'DEPLOYED'
-    : 'UNDEPLOYED';
+  return <DeploymentStatus> deploymentStatus.find((status) => status.name === name)?.deploymentStatus ?? 'UNDEPLOYED'
 }
+
+function getSemanticStatus(name: string,
+  deploymentStatus: IntegrationDeploumentStatus[]): SemanticStatus {
+    return <SemanticStatus> deploymentStatus.find((status) => status.name === name)?.semanticState ?? ''
+  }
 
 function getSapArtifactId(name: string,
   deploymentStatus: IntegrationDeploumentStatus[]) {
