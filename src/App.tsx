@@ -128,12 +128,12 @@ export default function App() {
         artifact.displayName.includes(filterInputValue) &&
         ((artifact.deployStatus === 'DEPLOYED' &&
           isDeployedArtifactsCheckboxChecked) ||
-          (artifact.deployStatus === 'UNDEPLOYED' &&
+          ((artifact.deployStatus === 'DEPLOYING' || artifact.deployStatus === 'UNDEPLOYING' || artifact.deployStatus === 'UNDEPLOYED') &&
             isUndeployedArtifactsCheckboxChecked))
     );
   }
 
-  const headers = ['Artifact name', 'Deployment Status'];
+  const headers = ['Artifact name', 'Deployment Status', 'Status'];
 
   console.log(isButtonsDisabled)
 

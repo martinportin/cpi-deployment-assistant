@@ -58,11 +58,14 @@ interface Artifact {
   displayName: string;
   name: string;
   deployStatus: DeploymentStatus;
+  semanticStatus: SemanticStatus;
   packageRegId: string;
   sapArtifactId: string | null;
 }
 
-type DeploymentStatus = 'DEPLOYED' | 'UNDEPLOYED';
+type DeploymentStatus = 'DEPLOYED' | 'DEPLOYING' | 'UNDEPLOYING' | 'UNDEPLOYED';
+
+type SemanticStatus = 'STARTED' | 'STARTING' | 'STOPPING' | 'ERROR' | ''
 
 export {
   MessageObject,
@@ -74,5 +77,6 @@ export {
   IntegrationDeploumentStatus,
   Package,
   Artifact,
-  DeploymentStatus
+  DeploymentStatus,
+  SemanticStatus
 };
