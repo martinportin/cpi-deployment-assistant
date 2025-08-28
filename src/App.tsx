@@ -11,7 +11,7 @@ import {
 } from '@ui5/webcomponents-react';
 import { MouseEvent, useState } from 'react';
 import { sendMessage } from './utils/Message';
-import { Artifact } from './custom';
+import { Artifact, DeploymentStatus } from './custom';
 import BottomToolbar from './components/BottomToolbar';
 import TopToolbar from './components/TopToolbar';
 import { ButtonClickEventDetail } from '@ui5/webcomponents/dist/Button';
@@ -123,19 +123,18 @@ export default function App() {
   }
 
   function filterArtifacts(): Artifact[] {
+    const undeployedDeployedStatus: DeploymentStatus[] = ['DEPLOYING', 'UNDEPLOYING', 'UNDEPLOYED', 'STORED', 'DELETED']
     return artifacts.filter(
       (artifact) =>
-        artifact.displayName.includes(filterInputValue) &&
+        artifact.displayName.toUpperCase().includes(filterInputValue.toUpperCase()) &&
         ((artifact.deployStatus === 'DEPLOYED' &&
           isDeployedArtifactsCheckboxChecked) ||
-          ((artifact.deployStatus === 'DEPLOYING' || artifact.deployStatus === 'UNDEPLOYING' || artifact.deployStatus === 'UNDEPLOYED') &&
+          (undeployedDeployedStatus.includes(artifact.deployStatus) &&
             isUndeployedArtifactsCheckboxChecked))
     );
   }
 
   const headers = ['Artifact name', 'Deployment Status', 'Status'];
-
-  console.log(isButtonsDisabled)
 
   return (
     <Page

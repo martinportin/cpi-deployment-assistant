@@ -63,7 +63,7 @@ interface Artifact {
   sapArtifactId: string | null;
 }
 
-type DeploymentStatus = 'DEPLOYED' | 'DEPLOYING' | 'UNDEPLOYING' | 'UNDEPLOYED';
+type DeploymentStatus = 'DEPLOYED' | 'DEPLOYING' | 'UNDEPLOYING' | 'UNDEPLOYED' | 'STORED' | 'DELETED';
 
 type SemanticStatus = 'STARTED' | 'STARTING' | 'STOPPING' | 'ERROR' | ''
 
