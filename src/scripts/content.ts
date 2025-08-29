@@ -5,7 +5,6 @@ import {
   CPIPackage,
   XHRResponse,
   DeploymentStatus,
-  XHRRequest,
   SemanticStatus
 } from '../custom';
 import { handleMessage } from '../utils/Message';
@@ -152,11 +151,14 @@ async function deployArtifact(
 
 async function undeployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
   const failedArtifacts = []
+  const tenantPostContent: RegExp = /^(.*?)\.integrationsuite/
+  const tenantInformation = tenantPostContent.exec(domain)
+  const tenant = tenantInformation !== null ? tenantInformation[1] : '';
   for (const artifact of artifacts) {
     try {
       const body = new FormData()
       body.append('artifactIds', artifact.sapArtifactId ?? '')
-      body.append('tenantId', 'development-po4xtz6u')
+      body.append('tenantId', tenant)
       await undeployArtifact(domain, body);
     } catch (error) {
       console.log(error);

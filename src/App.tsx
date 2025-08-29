@@ -4,6 +4,8 @@ import {
   BusyIndicator,
   ButtonDomRef,
   InputDomRef,
+  MessageBox,
+  MessageBoxAction,
   Page,
   TableSelectionMultiDomRef,
   Toast,
@@ -31,6 +33,9 @@ export default function App() {
   const [selectedRowsKeys, setSelectedRowsKeys] = useState('')
   const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
   const [showBusyIndicator, setShowBusyIndicator] = useState(false);
+  const [showNoArtifactsSelectedMessageBox, setShowNoArtifactsSelectedMessageBox] = useState(false)
+  const [showDeployConfirmationMessageBox, setShowDeployConfirmationMessageBox] = useState(false)
+  const [showUndeployConfirmationMessageBox, setShowUndeployConfirmationMessageBox] = useState(false)
   const [showDeploymentSuccessToast, setShowDeploymentSuccessToast] = useState(false);
   const [showUndeploymentSuccessToast, setShowUndeploymentSuccessToast] = useState(false);
 
@@ -77,6 +82,21 @@ export default function App() {
   }
 
   async function handleDeployArtifactsButtonClick() {
+    if(selectedRowsKeys.length) {
+      setShowDeployConfirmationMessageBox(true);
+    } else {
+      setShowNoArtifactsSelectedMessageBox(true);
+    }
+  }
+
+  function handleDeployConfirmationMessageBoxClose(action: string | undefined, escPressed: boolean | undefined): void {
+    if (action === 'OK') {
+      deployArtifacts()
+    }
+    setShowDeployConfirmationMessageBox(false)
+  }
+
+  async function deployArtifacts(): Promise<void> {
     try {
       setIsButtonsDisabled(true)
       setShowBusyIndicator(true)
@@ -93,6 +113,10 @@ export default function App() {
     }
   }
 
+  function handleNoArtifactsSelectedMessageBoxClose() {
+    setShowNoArtifactsSelectedMessageBox(false);
+  }
+
   function getSelectedArtifacts(artifacts: Artifact[]): Artifact[] {
     return artifacts.filter((artifact) => selectedRowsKeys.split(' ').some((key) => artifact.regId === key))
   }
@@ -102,6 +126,21 @@ export default function App() {
   }
 
   async function handleUndeployArtifactsButtonClick() {
+    if(selectedRowsKeys.length) {
+      setShowUndeployConfirmationMessageBox(true)
+    } else {
+      setShowNoArtifactsSelectedMessageBox(true);
+    }
+  }
+
+  function handleUndeployConfirmationMessageBoxClose(action: string | undefined, escPressed: boolean | undefined): void {
+    if (action === 'OK') {
+      undeployArtifacts()
+    }
+    setShowUndeployConfirmationMessageBox(false)
+  }
+
+  async function undeployArtifacts(): Promise<void> {
     try {
       setIsButtonsDisabled(true)
       setShowBusyIndicator(true)
@@ -164,10 +203,13 @@ export default function App() {
         />
       }
       style={{ height: '500px' }}
-    > 
+    >
       <BusyIndicator active={showBusyIndicator} size='L' style={ { display: 'block'}}>
         <Table headers={headers} artifacts={filterArtifacts()} handleSelectionChange={handleTableSelectionChange}/>
       </BusyIndicator>
+      <MessageBox type='Information' open={showNoArtifactsSelectedMessageBox} actions={[MessageBoxAction.OK]} onClose={handleNoArtifactsSelectedMessageBoxClose}>Select artifacts to deploy or undeploy.</MessageBox>
+      <MessageBox open={showDeployConfirmationMessageBox} actions={[MessageBoxAction.OK, MessageBoxAction.Cancel]} onClose={handleDeployConfirmationMessageBoxClose}>Selected artifacts will be deployed. Press OK to continue.</MessageBox>
+      <MessageBox open={showUndeployConfirmationMessageBox} actions={[MessageBoxAction.OK, MessageBoxAction.Cancel]} onClose={handleUndeployConfirmationMessageBoxClose}>Selected artifacts will be undeployed. Press OK to continue.</MessageBox>
       <Toast open={showDeploymentSuccessToast} onClose={handleDeploymentSuccessToastClose}>All selected artifacts have been triggered for deployment!</Toast>
       <Toast open={showUndeploymentSuccessToast} onClose={handleUndeploymentSuccessToastClose}>All selected artifacts have been triggered for undeployment!</Toast>
     </Page>

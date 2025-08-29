@@ -5,12 +5,12 @@
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "Open the popup"
+    "default_title": "SAP CPI Deploy Assistant"
   },
   "content_scripts": [
     {
       "matches": [
-        "https://*.cfapps.eu20.hana.ondemand.com/shell/monitoring/Artifacts/*"
+        "https://*.cfapps.eu20.hana.ondemand.com/shell/*"
       ],
       "js": [
         "./static/js/content.js"
