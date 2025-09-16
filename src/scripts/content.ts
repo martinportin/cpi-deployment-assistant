@@ -71,10 +71,10 @@ function getIntegratonDeploymentStatus(
 }
 
 function extractSapArtifactId(nodes: NodeListOf<ChildNode>) {
-  const sapArtifactId = <Element> [...nodes].find((node) => {
-    const element = <Element> node;
-    return element.getAttribute('name') === 'SAP-ArtifactId'
-  })
+  const sapArtifactId = [...nodes].find((node) => {
+    const element = node as Element;
+    return element.getAttribute('name') === 'SAP-ArtifactId';
+  }) as Element;
   return sapArtifactId.getAttribute('value');
 }
 
@@ -93,11 +93,15 @@ function extractArtifacts(
           cpiArtifact.DisplayName,
           integrationDeploymentStatus
         ),
-        semanticStatus: getSemanticStatus(cpiArtifact.DisplayName,
-          integrationDeploymentStatus),
+        semanticStatus: getSemanticStatus(
+          cpiArtifact.DisplayName,
+          integrationDeploymentStatus
+        ),
         packageRegId: cpiPackage.reg_id,
-        sapArtifactId: getSapArtifactId(cpiArtifact.DisplayName,
-          integrationDeploymentStatus)
+        sapArtifactId: getSapArtifactId(
+          cpiArtifact.DisplayName,
+          integrationDeploymentStatus
+        )
       })
     );
     artifacts.push(...cpiPackageArtifacts);
@@ -109,26 +113,47 @@ function getDeploymentStatus(
   name: string,
   deploymentStatus: IntegrationDeploumentStatus[]
 ): DeploymentStatus {
-  return <DeploymentStatus> deploymentStatus.find((status) => status.name === name)?.deploymentStatus ?? 'UNDEPLOYED'
+  return (
+    (deploymentStatus.find((status) => status.name === name)
+      ?.deploymentStatus as DeploymentStatus) ?? 'UNDEPLOYED'
+  );
 }
 
-function getSemanticStatus(name: string,
-  deploymentStatus: IntegrationDeploumentStatus[]): SemanticStatus {
-    return <SemanticStatus> deploymentStatus.find((status) => status.name === name)?.semanticState ?? ''
-  }
+function getSemanticStatus(
+  name: string,
+  deploymentStatus: IntegrationDeploumentStatus[]
+): SemanticStatus {
+  return (
+    (deploymentStatus.find((status) => status.name === name)
+      ?.semanticState as SemanticStatus) ?? ''
+  );
+}
 
-function getSapArtifactId(name: string,
-  deploymentStatus: IntegrationDeploumentStatus[]) {
-    return deploymentStatus.find((status) => status.name === name)?.sapArtifactId ?? null;
-  }
+function getSapArtifactId(
+  name: string,
+  deploymentStatus: IntegrationDeploumentStatus[]
+) {
+  return (
+    deploymentStatus.find((status) => status.name === name)?.sapArtifactId ??
+    null
+  );
+}
 
-async function deployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
-  const failedArtifacts = []
+async function deployArtifacts(
+  domain: string,
+  artifacts: Artifact[]
+): Promise<Artifact[]> {
+  const failedArtifacts = [];
   for (const artifact of artifacts) {
     try {
-      await deployArtifact(domain, artifact.packageRegId, artifact.regId, artifact.name);
+      await deployArtifact(
+        domain,
+        artifact.packageRegId,
+        artifact.regId,
+        artifact.name
+      );
     } catch (error) {
-      console.log(error)
+      console.log(error);
       failedArtifacts.push(artifact);
     }
   }
@@ -150,13 +175,16 @@ async function deployArtifact(
   });
 }
 
-async function undeployArtifacts(domain: string, artifacts: Artifact[]): Promise<Artifact[]> {
-  const failedArtifacts = []
+async function undeployArtifacts(
+  domain: string,
+  artifacts: Artifact[]
+): Promise<Artifact[]> {
+  const failedArtifacts = [];
   for (const artifact of artifacts) {
     try {
-      const body = new FormData()
-      body.append('artifactIds', artifact.sapArtifactId ?? '')
-      body.append('tenantId', 'development-po4xtz6u')
+      const body = new FormData();
+      body.append('artifactIds', artifact.sapArtifactId ?? '');
+      body.append('tenantId', 'development-po4xtz6u');
       await undeployArtifact(domain, body);
     } catch (error) {
       console.log(error);
@@ -166,14 +194,17 @@ async function undeployArtifacts(domain: string, artifacts: Artifact[]): Promise
   return failedArtifacts;
 }
 
-async function undeployArtifact(domain: string, body: XMLHttpRequestBodyInit): Promise<XMLHttpRequest> {
+async function undeployArtifact(
+  domain: string,
+  body: XMLHttpRequestBodyInit
+): Promise<XMLHttpRequest> {
   return await makeXHRRequest({
     method: 'POST',
     domain,
     resource: '/Operations/com.sap.it.nm.commands.deploy.DeleteContentCommand',
     body,
     useCsrfToken: true
-  })
+  });
 }
 
 addMessageListener();
