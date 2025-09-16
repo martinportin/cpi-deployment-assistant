@@ -10,11 +10,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.cfapps.eu20.hana.ondemand.com/shell/monitoring/Artifacts/*"
+        "https://*.cfapps.eu20.hana.ondemand.com/shell/*",
+        "https://*.cfapps.ap21.hana.ondemand.com/shell/*"
       ],
-      "js": [
-        "./static/js/content.js"
-      ]
+      "js": ["./static/js/content.js"]
     }
   ]
 }

@@ -1,9 +1,4 @@
-import {
-  InputDomRef,
-  Ui5CustomEvent,
-  Bar,
-  Title
-} from '@ui5/webcomponents-react';
+import { InputDomRef, Ui5CustomEvent, Bar } from '@ui5/webcomponents-react';
 import Input from './Input';
 import BarDesign from '@ui5/webcomponents/dist/types/BarDesign';
 import Checkbox from './Checkbox';

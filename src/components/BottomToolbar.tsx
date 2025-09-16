@@ -1,4 +1,9 @@
-import { Bar, ButtonDomRef, Switch, Ui5CustomEvent } from '@ui5/webcomponents-react';
+import {
+  Bar,
+  ButtonDomRef,
+  Switch,
+  Ui5CustomEvent
+} from '@ui5/webcomponents-react';
 import ToolbarButton from './ToolbarButton';
 import ButtonDesign from '@ui5/webcomponents/dist/types/ButtonDesign';
 import { ButtonClickEventDetail } from '@ui5/webcomponents/dist/Button';
@@ -14,7 +19,7 @@ export default function BottomToolbar({
 }: Readonly<{
   slot?: string;
   design: BarDesign;
-  isButtonsDisabled: boolean
+  isButtonsDisabled: boolean;
   handleLoadArtifactsButtonClick: (
     event: Ui5CustomEvent<ButtonDomRef, ButtonClickEventDetail>
   ) => void;
@@ -31,12 +36,12 @@ export default function BottomToolbar({
       design={design}
       startContent={
         <>
-        <ToolbarButton
-          id="loadArtifactsButton"
-          disabled={isButtonsDisabled}
-          handleClick={handleLoadArtifactsButtonClick}
-          text="Load artifacts"
-        />
+          <ToolbarButton
+            id="loadArtifactsButton"
+            disabled={isButtonsDisabled}
+            handleClick={handleLoadArtifactsButtonClick}
+            text="Load artifacts"
+          />
         </>
       }
       endContent={

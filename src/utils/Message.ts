@@ -1,6 +1,9 @@
 import { Artifact, Message, MessageObject } from '../custom';
 
-async function sendMessage(message: Message, artifacts?: Artifact[]): Promise<Artifact[]> {
+async function sendMessage(
+  message: Message,
+  artifacts?: Artifact[]
+): Promise<Artifact[]> {
   return new Promise(async (resolve, reject) => {
     try {
       const [tab] = await chrome.tabs.query({
@@ -24,8 +27,14 @@ async function sendMessage(message: Message, artifacts?: Artifact[]): Promise<Ar
 function handleMessage(
   domain: string,
   getArtifacts: (domain: string) => Promise<Artifact[]>,
-  deployArtifacts: (domain: string, artifacts: Artifact[]) => Promise<Artifact[]>,
-  undeployArtifacts: (domain: string, artifacts: Artifact[]) => Promise<Artifact[]>
+  deployArtifacts: (
+    domain: string,
+    artifacts: Artifact[]
+  ) => Promise<Artifact[]>,
+  undeployArtifacts: (
+    domain: string,
+    artifacts: Artifact[]
+  ) => Promise<Artifact[]>
 ) {
   return (
     message: MessageObject,
@@ -39,12 +48,18 @@ function handleMessage(
       }
 
       if (message.message === 'deploy artifacts' && message.artifacts) {
-        const failedArtifacts = await deployArtifacts(domain, message.artifacts);
-        sendResponse(failedArtifacts)
+        const failedArtifacts = await deployArtifacts(
+          domain,
+          message.artifacts
+        );
+        sendResponse(failedArtifacts);
       }
 
       if (message.message === 'undeploy artifatcs' && message.artifacts) {
-        const failedArtifacts = await undeployArtifacts(domain, message.artifacts)
+        const failedArtifacts = await undeployArtifacts(
+          domain,
+          message.artifacts
+        );
         sendResponse(failedArtifacts);
       }
     })();

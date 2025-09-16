@@ -12,10 +12,20 @@ export default function Table({
   headers,
   artifacts,
   handleSelectionChange
-}: Readonly<{ headers: string[]; artifacts: Artifact[], handleSelectionChange: (event: Ui5CustomEvent<TableSelectionMultiDomRef, never>) => void }>) {
+}: Readonly<{
+  headers: string[];
+  artifacts: Artifact[];
+  handleSelectionChange: (
+    event: Ui5CustomEvent<TableSelectionMultiDomRef, never>
+  ) => void;
+}>) {
   return (
     <UI5Table id="artifactTable" headerRow={<TableHeader headers={headers} />}>
-      <TableSelectionMulti slot="features" headerSelector="SelectAll" onChange={handleSelectionChange}/>
+      <TableSelectionMulti
+        slot="features"
+        headerSelector="SelectAll"
+        onChange={handleSelectionChange}
+      />
       <TableRows artifacts={artifacts} />
     </UI5Table>
   );
