@@ -1,3 +1,4 @@
+import { cp } from 'node:fs/promises';
 import {
   Artifact,
   CPIArtifact,
@@ -5,7 +6,6 @@ import {
   CPIPackage,
   XHRResponse,
   DeploymentStatus,
-  XHRRequest,
   SemanticStatus
 } from '../custom';
 import { handleMessage } from '../utils/Message';
@@ -89,6 +89,7 @@ function extractArtifacts(
         regId: cpiArtifact.reg_id,
         displayName: cpiArtifact.DisplayName,
         name: cpiArtifact.Name,
+        type: cpiArtifact.Type,
         deployStatus: getDeploymentStatus(
           cpiArtifact.DisplayName,
           integrationDeploymentStatus

@@ -182,7 +182,7 @@ export default function App() {
     );
   }
 
-  const headers = ['Artifact name', 'Deployment Status', 'Status'];
+  const headers = ['Artifact name', 'Type', 'Deployment Status', 'Status'];
 
   return (
     <Page

@@ -36,6 +36,7 @@ interface CPIArtifacts {
 interface CPIArtifact {
   DisplayName: string;
   Name: string;
+  Type: string;
   reg_id: string;
 }
 
@@ -57,6 +58,7 @@ interface Artifact {
   regId: string;
   displayName: string;
   name: string;
+  type: string,
   deployStatus: DeploymentStatus;
   semanticStatus: SemanticStatus;
   packageRegId: string;

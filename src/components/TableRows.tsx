@@ -10,6 +10,9 @@ export default function TableRows({ artifacts }: { artifacts: Artifact[] }) {
           <Label>{artifact.displayName}</Label>
         </TableCell>
         <TableCell>
+          <Label>{artifact.type}</Label>
+        </TableCell>
+        <TableCell>
           <Label
             style={
               artifact.deployStatus === 'DEPLOYED'
